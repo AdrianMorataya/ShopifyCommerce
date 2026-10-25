@@ -1,4 +1,4 @@
-# 🛍️ ShopifyStorefront
+# 🛍️ ShopifyCommerce
 
 ### A Custom E-Commerce Experience Built with Angular, .NET & Shopify
 
@@ -253,7 +253,7 @@ These improvements will be considered as the core storefront and Shopify integra
 
 ## 👨‍💻 Author
 
-**Adrian Morataya**
+**Adrian Morataya &**
 **Alexis Monroy**
 
 [![GitHub](https://img.shields.io/badge/GitHub-AdrianMorataya-181717?style=for-the-badge&logo=github)](https://github.com/AdrianMorataya)
