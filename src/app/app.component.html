@@ -1,0 +1,211 @@
+<div class="top">
+  INDEPENDENT STREETWEAR — GUATEMALA & EVERYWHERE ↗
+</div>
+
+<nav>
+  <a href="#" class="logo">
+    WEST CODE<span>®</span>
+  </a>
+
+  <div class="navlinks">
+    <a href="#drop">EL DROP</a>
+    <a href="#marca">LA MARCA</a>
+    <span>EST. 2026</span>
+  </div>
+
+  <button
+    class="bag"
+    (click)="notify('Bolsa de muestra · ' + count() + ' gorras agregadas')"
+  >
+    BOLSA <b>{{ count() }}</b> ↗
+  </button>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <i></i>
+        DROP 001 — SIN PERMISO
+      </div>
+
+      <h1>
+        TU CALLE.<br>
+        <span class="outline">TU ESTILO.</span><br>
+        TUS REGLAS<span class="lime">.</span>
+      </h1>
+
+      <p>
+        La actitud no se compra. La gorra, sí.<br>
+        Hechas para quienes van a su propio ritmo.
+      </p>
+
+      <a class="cta" href="#drop">
+        EXPLORAR EL DROP
+        <span>↗</span>
+      </a>
+
+      <div class="micro">
+        DISEÑO INDEPENDIENTE
+        <span>✳</span>
+        ACTITUD SIN FILTRO
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="ring"></div>
+
+
+      <div class="stamp">
+        STREET<br>
+        APPROVED<br>
+        ★ ★ ★
+      </div>
+
+      <div class="cap hero-cap">
+        <div class="crown">
+          <div class="seam"></div>
+          <strong>A<span>™</span></strong>
+        </div>
+
+        <div class="visor"></div>
+      </div>
+
+      <div class="caption">
+        <span>01 / 03</span>
+
+        <div>
+          THE ORIGINAL<br>
+          <small>NEGRO ASFALTO / SNAPBACK</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div>
+      DE LA CALLE PARA LA CALLE ✳ FUERA DEL MOLDE ✳ SIN ETIQUETAS ✳
+      DE LA CALLE PARA LA CALLE ✳ FUERA DEL MOLDE ✳ SIN ETIQUETAS ✳
+    </div>
+  </div>
+
+  <section class="collection" id="drop">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow muted">
+          PIEZAS QUE HABLAN POR TI
+        </div>
+
+        <h2>
+          EL DROP ESTÁ AQUÍ<span class="lime">.</span>
+        </h2>
+      </div>
+
+      <div class="filters">
+        @for (f of ['TODAS', 'SNAPBACK', 'DAD HAT']; track f) {
+          <button
+            [class.active]="filter() === f"
+            (click)="filter.set(f)"
+          >
+            {{ f }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="grid">
+      @for (p of visible(); track p.id) {
+        <article
+          class="card"
+          (pointermove)="tilt($event)"
+          (pointerleave)="reset($event)"
+          [style.--cap]="p.color"
+          [style.--ink]="p.accent"
+        >
+          <div class="visual">
+            <span class="badge">{{ p.tag }}</span>
+
+            <button
+              class="heart"
+              [attr.aria-label]="
+                favorite().includes(p.id)
+                  ? 'Quitar de favoritos'
+                  : 'Agregar a favoritos'
+              "
+              [class.selected]="favorite().includes(p.id)"
+              (click)="toggle(p.id)"
+            >
+              {{ favorite().includes(p.id) ? '♥' : '♡' }}
+            </button>
+
+            <span class="serial">00{{ p.id + 1 }}</span>
+
+            <div class="cap">
+              <div class="crown">
+                <div class="seam"></div>
+                <strong>A<span>™</span></strong>
+              </div>
+
+              <div class="visor"></div>
+            </div>
+
+            <button class="add" (click)="add()">
+              AGREGAR A LA BOLSA
+              <span>+</span>
+            </button>
+          </div>
+
+          <div class="info">
+            <div>
+              <h3>{{ p.name }}</h3>
+              <p>{{ p.type }} / BORDADO ORIGINAL</p>
+            </div>
+
+            <b>Q {{ p.price }}</b>
+          </div>
+
+          <div class="swatches">
+            <i [style.background]="p.color"></i>
+            <i></i>
+            <span>AJUSTABLE · TALLA ÚNICA</span>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="manifesto" id="marca">
+    <span>NO SIGAS LA TENDENCIA.</span>
+
+    <h2>
+      DEJA HUELLA<span class="lime">↗</span>
+    </h2>
+
+    <p>
+      Nacimos de la energía de la calle.<br>
+      Para los que hacen su propio camino.
+    </p>
+
+    <span class="star">✳</span>
+  </section>
+</main>
+
+<footer>
+  <a href="#" class="logo">
+    WEST CODE<span>®</span>
+  </a>
+
+  <span>
+    CONCEPTO VISUAL · PRECIOS ILUSTRATIVOS · SIN PAGOS
+  </span>
+
+  <a href="#">VOLVER ARRIBA ↑</a>
+</footer>
+
+<div
+  class="toast"
+  role="status"
+  [class.show]="toast()"
+>
+  {{ toast() }}
+</div>

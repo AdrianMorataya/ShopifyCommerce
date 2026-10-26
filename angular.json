@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "projects": {
+    "asfalto": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "index": "src/index.html",
+            "tsConfig": "tsconfig.json",
+            "styles": [
+              "src/styles.css"
+            ],
+            "outputPath": "dist/asfalto"
+          }
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "asfalto:build"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "cf01b946-b4c7-4a67-9678-82244054e56b"
+  }
+}
