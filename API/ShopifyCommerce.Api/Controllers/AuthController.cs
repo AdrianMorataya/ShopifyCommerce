@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ShopifyCommerce.Api.DTOs;
 using ShopifyCommerce.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ShopifyCommerce.Api.Controllers;
 
@@ -152,6 +153,33 @@ public class AuthController : ControllerBase
                 user.LastName,
                 user.Email
             }
+        });
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(new
+        {
+            user.Id,
+            user.FirstName,
+            user.LastName,
+            user.Email
         });
     }
 }
