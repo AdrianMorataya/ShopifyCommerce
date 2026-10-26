@@ -1,0 +1,67 @@
+<button class="account-trigger" (click)="open()" aria-haspopup="dialog">
+  <span aria-hidden="true">◎</span> {{ auth.authenticated() ? 'MI PERFIL' : 'MI CUENTA' }}
+</button>
+
+<dialog #accountDialog class="account-dialog" aria-labelledby="account-title">
+  <div class="account-shell">
+    <aside class="identity">
+      <a class="wordmark" href="#" (click)="close()">WEST CODE<span>®</span></a>
+      <span class="edition">MEMBERS ACCESS / 001</span>
+      <div class="identity-copy">
+        <p class="eyeline">NO SIGAS EL CAMINO.</p>
+        <h2>CREA<br>TU PROPIO<br><span>CÓDIGO.</span></h2>
+        <p>Tu estilo. Tu comunidad.<br>Un lugar para ser tú.</p>
+      </div>
+      <span class="identity-star" aria-hidden="true">✳</span>
+      <div class="identity-footer">STREET CULTURE <span>EST. 2026 ↗</span></div>
+    </aside>
+
+    <section class="form-side">
+      <button class="close" (click)="close()" aria-label="Cerrar Mi cuenta">×</button>
+      <div class="form-content">
+        @if (auth.user(); as user) {
+          <div class="eyeline">YA ESTÁS DENTRO</div>
+          <h2 id="account-title">HOLA,<br><span>{{ user.firstName }}.</span></h2>
+          <p class="intro">Tu cuenta, tu identidad.</p>
+          <div class="profile"><span>NOMBRE</span><p>{{user.firstName}} {{user.lastName}}</p><span>CORREO</span><p>{{user.email}}</p></div>
+          @if (notice()) { <p class="notice" role="status">{{notice()}}</p> }
+          <button class="submit" (click)="close()">VOLVER AL DROP <span>↗</span></button>
+          <button class="logout" (click)="logout()">Cerrar sesión</button>
+        } @else {
+          <div class="tabs" role="tablist" aria-label="Acceso a cuenta">
+            <button id="login-tab" role="tab" [attr.aria-selected]="tab()==='login'" aria-controls="account-panel" [class.active]="tab()==='login'" [disabled]="busy()" (click)="changeTab('login')">INICIAR SESIÓN</button>
+            <button id="register-tab" role="tab" [attr.aria-selected]="tab()==='register'" aria-controls="account-panel" [class.active]="tab()==='register'" [disabled]="busy()" (click)="changeTab('register')">CREAR CUENTA</button>
+          </div>
+          <div id="account-panel" role="tabpanel" [attr.aria-labelledby]="tab()==='login'?'login-tab':'register-tab'">
+            <div class="eyeline">{{tab()==='login'?'TU LUGAR SIGUE AQUÍ':'SÉ PARTE DE WEST CODE'}}</div>
+            <h2 id="account-title">{{tab()==='login'?'DE VUELTA':'ÚNETE AL'}}<br><span>{{tab()==='login'?'A LA CALLE.':'MOVIMIENTO.'}}</span></h2>
+            <p class="intro">{{tab()==='login'?'Entra a tu cuenta y sigue marcando tu estilo.':'Crea tu cuenta. La actitud ya la tienes.'}}</p>
+            @if (notice()) { <p class="notice" role="status">{{notice()}}</p> }
+            @if (error()) { <p class="error" role="alert">{{error()}}</p> }
+            @if (tab()==='login') {
+              <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" [attr.aria-busy]="busy()" novalidate>
+                <label for="login-email">CORREO ELECTRÓNICO</label>
+                <input id="login-email" type="email" formControlName="email" autocomplete="username" placeholder="tu@correo.com" [attr.aria-invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid">
+                <label for="login-password">CONTRASEÑA</label>
+                <div class="password-field"><input id="login-password" [type]="showPassword()?'text':'password'" formControlName="password" autocomplete="current-password" placeholder="Tu contraseña"><button type="button" (click)="showPassword.set(!showPassword())" [attr.aria-label]="showPassword()?'Ocultar contraseña':'Mostrar contraseña'">{{showPassword()?'OCULTAR':'VER'}}</button></div>
+                <button class="submit" [disabled]="busy()" type="submit">{{busy()?'CONECTANDO…':'ENTRAR A MI CUENTA'}} <span>↗</span></button>
+              </form>
+              <p class="switch">¿Primera vez por aquí? <button [disabled]="busy()" (click)="changeTab('register')">Crea tu cuenta</button></p>
+            } @else {
+              <form [formGroup]="registerForm" (ngSubmit)="submitRegister()" [attr.aria-busy]="busy()" novalidate>
+                <div class="name-grid"><div><label for="first-name">NOMBRE</label><input id="first-name" formControlName="firstName" autocomplete="given-name" maxlength="50" placeholder="Tu nombre"></div><div><label for="last-name">APELLIDO</label><input id="last-name" formControlName="lastName" autocomplete="family-name" maxlength="50" placeholder="Tu apellido"></div></div>
+                <label for="register-email">CORREO ELECTRÓNICO</label><input id="register-email" type="email" formControlName="email" autocomplete="email" placeholder="tu@correo.com">
+                <label for="register-password">CONTRASEÑA</label><div class="password-field"><input id="register-password" [type]="showPassword()?'text':'password'" formControlName="password" autocomplete="new-password" aria-describedby="password-help" placeholder="Crea tu contraseña"><button type="button" (click)="showPassword.set(!showPassword())" [attr.aria-label]="showPassword()?'Ocultar contraseña':'Mostrar contraseña'">{{showPassword()?'OCULTAR':'VER'}}</button></div>
+                <p class="help" id="password-help">Mínimo 8 caracteres, una mayúscula, una minúscula y un número.</p>
+                <label for="confirm-password">CONFIRMAR CONTRASEÑA</label><input id="confirm-password" [type]="showPassword()?'text':'password'" formControlName="confirm" autocomplete="new-password" placeholder="Repite tu contraseña">
+                <button class="submit" [disabled]="busy()" type="submit">{{busy()?'CREANDO CUENTA…':'CREAR MI CUENTA'}} <span>↗</span></button>
+              </form>
+              <p class="switch">¿Ya tienes tu código? <button [disabled]="busy()" (click)="changeTab('login')">Inicia sesión</button></p>
+            }
+          </div>
+        }
+        <div class="bottom-note">WEST CODE® <span>OWN YOUR STYLE.</span></div>
+      </div>
+    </section>
+  </div>
+</dialog>

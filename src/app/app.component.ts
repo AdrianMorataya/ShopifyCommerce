@@ -1,8 +1,10 @@
 import { Component, computed, signal } from '@angular/core';
+import { AuthComponent } from './auth/auth.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
+  imports: [AuthComponent],
   templateUrl: './app.component.html'
 })
 export class AppComponent {
@@ -43,7 +45,9 @@ export class AppComponent {
 
   visible = computed(() =>
     this.products.filter(
-      p => this.filter() === 'TODAS' || p.type === this.filter()
+      product =>
+        this.filter() === 'TODAS' ||
+        product.type === this.filter()
     )
   );
 
@@ -60,44 +64,44 @@ export class AppComponent {
   }
 
   add() {
-    this.count.update(n => n + 1);
+    this.count.update(count => count + 1);
     this.notify('AGREGADA A TU BOLSA ↗');
   }
 
   toggle(id: number) {
-    this.favorite.update(a =>
-      a.includes(id)
-        ? a.filter(i => i !== id)
-        : [...a, id]
+    this.favorite.update(favorites =>
+      favorites.includes(id)
+        ? favorites.filter(favoriteId => favoriteId !== id)
+        : [...favorites, id]
     );
   }
 
-  tilt(e: PointerEvent) {
+  tilt(event: PointerEvent) {
     if (
-      e.pointerType === 'touch' ||
+      event.pointerType === 'touch' ||
       matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
       return;
     }
 
-    const el = e.currentTarget as HTMLElement;
-    const r = el.getBoundingClientRect();
+    const element = event.currentTarget as HTMLElement;
+    const rectangle = element.getBoundingClientRect();
 
-    el.style.setProperty(
+    element.style.setProperty(
       '--rx',
-      `${-(e.clientY - r.top - r.height / 2) / 25}deg`
+      `${-(event.clientY - rectangle.top - rectangle.height / 2) / 25}deg`
     );
 
-    el.style.setProperty(
+    element.style.setProperty(
       '--ry',
-      `${(e.clientX - r.left - r.width / 2) / 25}deg`
+      `${(event.clientX - rectangle.left - rectangle.width / 2) / 25}deg`
     );
   }
 
-  reset(e: PointerEvent) {
-    const el = e.currentTarget as HTMLElement;
+  reset(event: PointerEvent) {
+    const element = event.currentTarget as HTMLElement;
 
-    el.style.setProperty('--rx', '0deg');
-    el.style.setProperty('--ry', '0deg');
+    element.style.setProperty('--rx', '0deg');
+    element.style.setProperty('--ry', '0deg');
   }
 }
