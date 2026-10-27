@@ -1,10 +1,14 @@
 import { Component, computed, signal } from '@angular/core';
 import { AuthComponent } from './auth/auth.component';
+import { CheckoutComponent } from './checkout/checkout.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AuthComponent],
+  imports: [
+    AuthComponent,
+    CheckoutComponent
+  ],
   templateUrl: './app.component.html'
 })
 export class AppComponent {

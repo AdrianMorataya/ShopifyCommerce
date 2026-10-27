@@ -1,0 +1,750 @@
+<button
+  class="bag-trigger"
+  type="button"
+  (click)="open()"
+  aria-haspopup="dialog"
+>
+  BOLSA
+  <b>{{ quantity() }}</b>
+  <span aria-hidden="true">↗</span>
+</button>
+
+<dialog
+  #checkoutDialog
+  class="checkout-dialog"
+  aria-labelledby="checkout-title"
+>
+  <header class="checkout-header">
+    <a class="brand" href="#" (click)="close()">
+      WEST CODE<span>®</span>
+    </a>
+
+    <span class="preview-label">VISTA PREVIA</span>
+
+    <button
+      class="close-button"
+      type="button"
+      (click)="close()"
+      aria-label="Cerrar carrito"
+    >
+      ×
+    </button>
+  </header>
+
+  @if (step() !== 'complete') {
+    <nav class="steps" aria-label="Pasos de compra">
+      <button
+        type="button"
+        [class.active]="step() === 'cart'"
+        [attr.aria-current]="step() === 'cart' ? 'step' : null"
+        (click)="goTo('cart')"
+      >
+        <span>01</span>
+        BOLSA
+      </button>
+
+      <i aria-hidden="true"></i>
+
+      <button
+        type="button"
+        [class.active]="step() === 'delivery'"
+        [disabled]="items().length === 0"
+        [attr.aria-current]="step() === 'delivery' ? 'step' : null"
+        (click)="goTo('delivery')"
+      >
+        <span>02</span>
+        ENTREGA
+      </button>
+
+      <i aria-hidden="true"></i>
+
+      <button
+        type="button"
+        [class.active]="step() === 'payment'"
+        [disabled]="items().length === 0"
+        [attr.aria-current]="step() === 'payment' ? 'step' : null"
+        (click)="goTo('payment')"
+      >
+        <span>03</span>
+        PAGO
+      </button>
+    </nav>
+
+    <div class="checkout-layout">
+      <section class="main-panel">
+        @switch (step()) {
+          @case ('cart') {
+            <div class="eyebrow">
+              PIEZAS CON PERSONALIDAD
+            </div>
+
+            <h1 id="checkout-title">
+              TU BOLSA<span>.</span>
+            </h1>
+
+            <p class="intro">
+              Tu próximo look empieza aquí.
+            </p>
+
+            @if (items().length > 0) {
+              <div class="items-heading">
+                <span>PRODUCTO</span>
+                <span>{{ quantity() }} PIEZAS</span>
+              </div>
+
+              @for (item of items(); track item.id) {
+                <article class="cart-item">
+                  <div
+                    class="product-image"
+                    [style.--cap-color]="item.color"
+                    [style.--cap-accent]="item.accent"
+                    role="img"
+                    [attr.aria-label]="item.name"
+                  >
+                    <div class="mini-cap">
+                      <div class="mini-crown">
+                        <b>W</b>
+                      </div>
+
+                      <div class="mini-brim"></div>
+                    </div>
+                  </div>
+
+                  <div class="product-details">
+                    <h2>{{ item.name }}</h2>
+                    <p>{{ item.type }}</p>
+
+                    <span class="unit-price">
+                      {{ money(item.price) }} / unidad
+                    </span>
+
+                    <div
+                      class="quantity-control"
+                      [attr.aria-label]="'Cantidad de ' + item.name"
+                    >
+                      <button
+                        type="button"
+                        [disabled]="item.quantity <= 1"
+                        (click)="changeQuantity(item.id, -1)"
+                        [attr.aria-label]="'Reducir cantidad de ' + item.name"
+                      >
+                        −
+                      </button>
+
+                      <span aria-live="polite">
+                        {{ item.quantity }}
+                      </span>
+
+                      <button
+                        type="button"
+                        [disabled]="item.quantity >= 10"
+                        (click)="changeQuantity(item.id, 1)"
+                        [attr.aria-label]="'Aumentar cantidad de ' + item.name"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="item-end">
+                    <strong>
+                      {{ money(item.price * item.quantity) }}
+                    </strong>
+
+                    <button
+                      class="text-button"
+                      type="button"
+                      (click)="remove(item.id)"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </article>
+              }
+
+              <div class="street-note">
+                <span aria-hidden="true">✳</span>
+                EL ESTILO ES TUYO. LAS REGLAS TAMBIÉN.
+              </div>
+
+              <button
+                class="primary"
+                type="button"
+                (click)="goTo('delivery')"
+              >
+                CONTINUAR CON LA ENTREGA
+                <span>↗</span>
+              </button>
+            } @else {
+              <div class="empty-state">
+                <span aria-hidden="true">↗</span>
+
+                <h2>TU BOLSA ESTÁ VACÍA.</h2>
+
+                <p>El próximo drop te está esperando.</p>
+
+                <button
+                  class="primary"
+                  type="button"
+                  (click)="close()"
+                >
+                  VOLVER A LA TIENDA
+                  <span>↗</span>
+                </button>
+
+                <button
+                  class="text-button"
+                  type="button"
+                  (click)="restoreDemo()"
+                >
+                  Restaurar productos de muestra
+                </button>
+              </div>
+            }
+          }
+
+          @case ('delivery') {
+            <div class="eyebrow">
+              DE LA CALLE A TU PUERTA
+            </div>
+
+            <h1 id="checkout-title">
+              ¿A DÓNDE<br>
+              VAMOS<span>?</span>
+            </h1>
+
+            <p class="intro">
+              Completa los datos de entrega. En esta vista no se envían.
+            </p>
+
+            <form
+              class="delivery-form"
+              (ngSubmit)="goTo('payment')"
+            >
+              <h2 class="section-title">
+                <span>01</span>
+                TUS DATOS
+              </h2>
+
+              <div class="field-grid">
+                <div>
+                  <label for="delivery-first">NOMBRE</label>
+
+                  <input
+                    id="delivery-first"
+                    name="firstName"
+                    [(ngModel)]="delivery.firstName"
+                    autocomplete="given-name"
+                    placeholder="Tu nombre"
+                  >
+                </div>
+
+                <div>
+                  <label for="delivery-last">APELLIDO</label>
+
+                  <input
+                    id="delivery-last"
+                    name="lastName"
+                    [(ngModel)]="delivery.lastName"
+                    autocomplete="family-name"
+                    placeholder="Tu apellido"
+                  >
+                </div>
+
+                <div>
+                  <label for="delivery-email">
+                    CORREO ELECTRÓNICO
+                  </label>
+
+                  <input
+                    id="delivery-email"
+                    name="email"
+                    [(ngModel)]="delivery.email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="tu@correo.com"
+                  >
+                </div>
+
+                <div>
+                  <label for="delivery-phone">TELÉFONO</label>
+
+                  <input
+                    id="delivery-phone"
+                    name="phone"
+                    [(ngModel)]="delivery.phone"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="+502 0000 0000"
+                  >
+                </div>
+              </div>
+
+              <h2 class="section-title">
+                <span>02</span>
+                TU DIRECCIÓN
+              </h2>
+
+              <div class="field-grid">
+                <div>
+                  <label for="delivery-department">
+                    DEPARTAMENTO
+                  </label>
+
+                  <select
+                    id="delivery-department"
+                    name="department"
+                    [(ngModel)]="delivery.department"
+                    autocomplete="address-level1"
+                  >
+                    <option value="" disabled>
+                      Seleccionar
+                    </option>
+
+                    <option value="Guatemala">
+                      Guatemala
+                    </option>
+
+                    <option value="Sacatepéquez">
+                      Sacatepéquez
+                    </option>
+
+                    <option value="Quetzaltenango">
+                      Quetzaltenango
+                    </option>
+
+                    <option value="Escuintla">
+                      Escuintla
+                    </option>
+
+                    <option value="Otro departamento">
+                      Otro departamento
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="delivery-municipality">
+                    MUNICIPIO
+                  </label>
+
+                  <input
+                    id="delivery-municipality"
+                    name="municipality"
+                    [(ngModel)]="delivery.municipality"
+                    autocomplete="address-level2"
+                    placeholder="Tu municipio"
+                  >
+                </div>
+              </div>
+
+              <label for="delivery-address">DIRECCIÓN</label>
+
+              <input
+                id="delivery-address"
+                name="address"
+                [(ngModel)]="delivery.address"
+                autocomplete="street-address"
+                placeholder="Calle, avenida, número de casa y zona"
+              >
+
+              <label for="delivery-reference">REFERENCIA</label>
+
+              <input
+                id="delivery-reference"
+                name="reference"
+                [(ngModel)]="delivery.reference"
+                placeholder="Un lugar cercano para ubicarnos"
+              >
+
+              <label for="delivery-notes">
+                INDICACIONES ADICIONALES
+                <span>(OPCIONAL)</span>
+              </label>
+
+              <textarea
+                id="delivery-notes"
+                name="notes"
+                [(ngModel)]="delivery.notes"
+                rows="2"
+                placeholder="Apartamento, acceso o indicaciones de entrega"
+              ></textarea>
+
+              <h2 class="section-title">
+                <span>03</span>
+                ELIGE TU ENVÍO
+              </h2>
+
+              <div class="shipping-options">
+                <label
+                  class="choice"
+                  [class.selected]="shipping() === 'standard'"
+                >
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="standard"
+                    [checked]="shipping() === 'standard'"
+                    (change)="shipping.set('standard')"
+                  >
+
+                  <span>
+                    <strong>ESTÁNDAR</strong>
+                    <small>2 a 4 días hábiles · Ejemplo</small>
+                  </span>
+
+                  <b>Q 25.00</b>
+                </label>
+
+                <label
+                  class="choice"
+                  [class.selected]="shipping() === 'express'"
+                >
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="express"
+                    [checked]="shipping() === 'express'"
+                    (change)="shipping.set('express')"
+                  >
+
+                  <span>
+                    <strong>EXPRESS</strong>
+                    <small>1 a 2 días hábiles · Ejemplo</small>
+                  </span>
+
+                  <b>Q 45.00</b>
+                </label>
+              </div>
+
+              <button class="primary" type="submit">
+                CONTINUAR AL PAGO
+                <span>↗</span>
+              </button>
+
+              <button
+                class="back-button"
+                type="button"
+                (click)="goTo('cart')"
+              >
+                ← Volver a la bolsa
+              </button>
+            </form>
+          }
+
+          @case ('payment') {
+            <div class="eyebrow">
+              EL ÚLTIMO PASO. TU PRÓXIMO LOOK.
+            </div>
+
+            <h1 id="checkout-title">
+              HAZLO<br>
+              TUYO<span>.</span>
+            </h1>
+
+            <p class="intro">
+              Elige cómo pagarías. No se realizan cobros en esta demo.
+            </p>
+
+            <fieldset class="payment-methods">
+              <legend>MÉTODO DE PAGO</legend>
+
+              <label
+                [class.selected]="paymentMethod() === 'card'"
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="card"
+                  [checked]="paymentMethod() === 'card'"
+                  (change)="paymentMethod.set('card')"
+                >
+
+                <span aria-hidden="true">▣</span>
+                <b>TARJETA</b>
+              </label>
+
+              <label
+                [class.selected]="paymentMethod() === 'transfer'"
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="transfer"
+                  [checked]="paymentMethod() === 'transfer'"
+                  (change)="paymentMethod.set('transfer')"
+                >
+
+                <span aria-hidden="true">⇄</span>
+                <b>TRANSFERENCIA</b>
+              </label>
+
+              <label
+                [class.selected]="paymentMethod() === 'cash'"
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cash"
+                  [checked]="paymentMethod() === 'cash'"
+                  (change)="paymentMethod.set('cash')"
+                >
+
+                <span aria-hidden="true">↗</span>
+                <b>CONTRA ENTREGA</b>
+              </label>
+            </fieldset>
+
+            @switch (paymentMethod()) {
+              @case ('card') {
+                <div
+                  class="display-card"
+                  aria-label="Ilustración de tarjeta de muestra"
+                >
+                  <div>
+                    <strong>WEST CODE</strong>
+                    <span>DEMO / 001</span>
+                  </div>
+
+                  <span class="chip" aria-hidden="true"></span>
+
+                  <p>•••• &nbsp; •••• &nbsp; •••• &nbsp; 0000</p>
+
+                  <div>
+                    <span>TU NOMBRE AQUÍ</span>
+                    <span>MM / AA</span>
+                  </div>
+                </div>
+
+                <label for="card-owner">TITULAR</label>
+
+                <input
+                  id="card-owner"
+                  value="NOMBRE DE EJEMPLO"
+                  disabled
+                >
+
+                <label for="card-number">NÚMERO DE TARJETA</label>
+
+                <input
+                  id="card-number"
+                  value="••••  ••••  ••••  0000"
+                  disabled
+                >
+
+                <div class="field-grid">
+                  <div>
+                    <label for="card-expiry">VENCIMIENTO</label>
+
+                    <input
+                      id="card-expiry"
+                      value="MM / AA"
+                      disabled
+                    >
+                  </div>
+
+                  <div>
+                    <label for="card-cvc">
+                      CÓDIGO DE SEGURIDAD
+                    </label>
+
+                    <input
+                      id="card-cvc"
+                      value="•••"
+                      disabled
+                    >
+                  </div>
+                </div>
+
+                <p class="field-note">
+                  Campos ilustrativos. No ingreses datos reales de tarjeta.
+                </p>
+              }
+
+              @case ('transfer') {
+                <div class="method-message">
+                  <span aria-hidden="true">⇄</span>
+
+                  <h2>A TU RITMO.</h2>
+
+                  <p>
+                    Aquí se mostrarían el banco, la cuenta y las
+                    instrucciones para transferir.
+                  </p>
+
+                  <div class="placeholder-line">
+                    DATOS BANCARIOS DE EJEMPLO
+                  </div>
+
+                  <small>
+                    No hay una cuenta bancaria habilitada en esta vista.
+                  </small>
+                </div>
+              }
+
+              @case ('cash') {
+                <div class="method-message">
+                  <span aria-hidden="true">↗</span>
+
+                  <h2>RECIBE. ESTRENA.</h2>
+
+                  <p>
+                    Aquí se mostrarían las condiciones y cobertura
+                    del pago contra entrega.
+                  </p>
+
+                  <div class="placeholder-line">
+                    TOTAL DE EJEMPLO: {{ money(total()) }}
+                  </div>
+
+                  <small>
+                    La disponibilidad de este método aún no está configurada.
+                  </small>
+                </div>
+              }
+            }
+
+            <div class="delivery-summary">
+              <div>
+                <span>ENTREGAR A</span>
+
+                <button
+                  type="button"
+                  (click)="goTo('delivery')"
+                >
+                  Editar ↗
+                </button>
+              </div>
+
+              <p>
+                {{ delivery.firstName || 'Tu nombre' }}
+                {{ delivery.lastName }}<br>
+                {{ delivery.address || 'Tu dirección de entrega' }}<br>
+                {{ delivery.municipality || 'Municipio' }} ·
+                {{ delivery.department || 'Departamento' }}
+              </p>
+            </div>
+
+            <button
+              class="primary"
+              type="button"
+              (click)="goTo('complete')"
+            >
+              FINALIZAR DEMO
+              <span>↗</span>
+            </button>
+
+            <button
+              class="back-button"
+              type="button"
+              (click)="goTo('delivery')"
+            >
+              ← Volver a los datos de entrega
+            </button>
+          }
+        }
+      </section>
+
+      <aside
+        class="order-summary"
+        aria-label="Resumen de compra"
+      >
+        <div class="summary-top">
+          <span>EL ESTILO ESTÁ EN LOS DETALLES</span>
+          <span aria-hidden="true">✳</span>
+        </div>
+
+        <h2>TU RESUMEN<span>.</span></h2>
+
+        <div class="summary-products">
+          @for (item of items(); track item.id) {
+            <div>
+              <span>
+                {{ item.name }}
+
+                <small>
+                  {{ item.quantity }} × {{ money(item.price) }}
+                </small>
+              </span>
+
+              <b>{{ money(item.price * item.quantity) }}</b>
+            </div>
+          }
+        </div>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <strong>{{ money(subtotal()) }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>
+            Envío {{ shipping() === 'express' ? 'express' : 'estándar' }}
+          </span>
+
+          <strong>{{ money(shippingCost()) }}</strong>
+        </div>
+
+        <div class="summary-total">
+          <span>TOTAL</span>
+          <strong>{{ money(total()) }}</strong>
+        </div>
+
+        <p class="summary-note">
+          Precios y envío ilustrativos en quetzales.
+        </p>
+
+        <div class="summary-brand">
+          TU ESTILO.<br>
+          <span>TUS REGLAS.</span>
+          <i aria-hidden="true">↗</i>
+        </div>
+
+        <div class="demo-note">
+          DEMO VISUAL · SIN COBROS NI PEDIDOS
+        </div>
+      </aside>
+    </div>
+  } @else {
+    <section class="complete-panel">
+      <div class="complete-symbol" aria-hidden="true">✳</div>
+
+      <div class="eyebrow">
+        WEST CODE / EXPERIENCIA DE COMPRA
+      </div>
+
+      <h1 id="checkout-title">
+        ASÍ SE VE<br>
+        TU PRÓXIMO<br>
+        <span>PASO.</span>
+      </h1>
+
+      <p>
+        Has recorrido la vista de compra.<br>
+        No se realizó ningún cobro ni se creó un pedido.
+      </p>
+
+      <button
+        class="primary"
+        type="button"
+        (click)="close()"
+      >
+        VOLVER A LA TIENDA
+        <span>↗</span>
+      </button>
+
+      <button
+        class="back-button"
+        type="button"
+        (click)="goTo('cart')"
+      >
+        Revisar las vistas otra vez
+      </button>
+    </section>
+  }
+
+  <footer class="checkout-footer">
+    <span>WEST CODE®</span>
+    <span>OWN YOUR STYLE. ↗</span>
+  </footer>
+</dialog>
